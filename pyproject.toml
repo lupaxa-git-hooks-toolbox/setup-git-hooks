@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lupaxa-setup-git-hooks"
-version = "0.0.0"
+version = "0.1.0"
 description = "Install Git Hooks Toolbox subhooks from per-type YAML."
 readme = "README.md"
 requires-python = ">=3.13"
