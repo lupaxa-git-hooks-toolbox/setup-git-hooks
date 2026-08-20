@@ -1,0 +1,72 @@
+[build-system]
+requires = ["hatchling>=1.18"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lupaxa-setup-git-hooks"
+version = "0.0.0"
+description = "Install Git Hooks Toolbox subhooks from per-type YAML."
+readme = "README.md"
+requires-python = ">=3.13"
+
+authors = [
+  { name = "The Lupaxa Project" }
+]
+
+keywords = ["git", "hooks", "setup"]
+
+dependencies = [
+  "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6.0",
+  "mypy>=1.12.0",
+  "types-PyYAML>=6.0",
+  "bump-my-version>=1.2.0",
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.7.7",
+]
+test = [
+  "pytest>=8.0",
+]
+
+[project.scripts]
+setup-hooks = "setup_hooks.cli:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/setup_hooks"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "S", "UP", "SIM", "C4", "ISC"]
+ignore = ["ISC001"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S"]
+# S603/S607: git.py invokes the git binary with a fixed argument list (no shell).
+"src/setup_hooks/git.py" = ["S603", "S607"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.13"
+warn_unused_configs = true
+disallow_untyped_defs = true
+follow_imports = "normal"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+addopts = "-ra -q --disable-warnings"
+testpaths = ["tests"]
+pythonpath = ["."]

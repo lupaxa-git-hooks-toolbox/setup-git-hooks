@@ -1,0 +1,12 @@
+- name: Hello one
+  filename: hello-one
+  url: https://github.com/lupaxa-git-hooks-toolbox/test-pre-commit-1
+  version: HEAD
+- name: Hello two
+  filename: hello-two
+  url: https://github.com/lupaxa-git-hooks-toolbox/test-pre-commit-2
+  version: LATEST
+- name: Hello three
+  filename: hello-three
+  url: https://github.com/lupaxa-git-hooks-toolbox/test-pre-commit-3
+  version: v0.1.0
