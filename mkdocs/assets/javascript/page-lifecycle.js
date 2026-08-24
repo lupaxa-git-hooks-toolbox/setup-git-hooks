@@ -49,25 +49,4 @@
     onPageRender,
   };
 
-  /**
-   * Resolve footer © years in the browser so the range stays current
-   * without rebuilding the site each January.
-   *
-   * Uses extra.start_year from the markup (data-start-year):
-   * - start < current  → "start-current"
-   * - otherwise        → current year
-   */
-  const initFooterYears = () => {
-    const current = new Date().getFullYear();
-    document.querySelectorAll(".footer-years").forEach((el) => {
-      const raw = el.getAttribute("data-start-year");
-      const start = raw ? Number.parseInt(raw, 10) : Number.NaN;
-      el.textContent =
-        Number.isFinite(start) && start < current
-          ? `${start}-${current}`
-          : String(current);
-    });
-  };
-
-  onPageRender(initFooterYears);
 })();
