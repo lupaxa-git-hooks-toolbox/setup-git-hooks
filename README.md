@@ -47,12 +47,17 @@ scripts are not committed. Re-run with `--force` to replace them.
 
 ## Documentation
 
-The guide is in [`mkdocs/`](mkdocs/index.md). After installing the `dev`
-extras:
+The published guide is at
+<https://setup-git-hooks.thelupaxaproject.org/>.
+
+Site Markdown lives in `mkdocs/`.
 
 ```bash
+python -m pip install -e ".[dev]"
 make mkdocs-serve
 ```
+
+`make mkdocs-build` builds the site. A strict build is `python -m mkdocs build --strict`.
 
 <a href="https://github.com/the-lupaxa-project">
   <img src="https://raw.githubusercontent.com/the-lupaxa-project/brand-assets/master/logos/components/footer-for-child-orgs.svg" alt="The Lupaxa Project Footer" width="100%" />

@@ -1,6 +1,6 @@
 # Reference
 
-## CLI flags
+## CLI Flags
 
 | Flag                      | Default        | Meaning                                                                  |
 | :------------------------ | :------------- | :----------------------------------------------------------------------- |
@@ -11,7 +11,7 @@
 | `-l`, `--list-hook-types` | off            | Print types discovered from `hooks/*-config.yml` (except mux) and exit 0 |
 | `-v`, `--verbose`         | off            | Include source URL and version in the Installing line                    |
 
-## Hook type YAML
+## Hook Type YAML
 
 `hooks/<type>-config.yml` is a list. Order is run order.
 

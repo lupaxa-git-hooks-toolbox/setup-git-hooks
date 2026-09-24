@@ -19,7 +19,7 @@ cyan spinner, then the same line turns green `Installed ...`. Failures
 turn that line red. `--force` first prints that generated scripts are
 being replaced. `-v` adds the source URL and version.
 
-## Re-runs
+## Re-Runs
 
 If generated scripts already exist under `hooks/<type>/`, the command
 fails and writes nothing. Pass `--force` to delete those `NN-*` files

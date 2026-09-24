@@ -1,4 +1,4 @@
-# Getting started
+# Getting Started
 
 ## Requirements
 
@@ -41,7 +41,7 @@ Each hook source repo ships one file at `src/<type>` (for example
 `src/pre-commit`). The pre-commit template repo is a starter for new
 hook repos, not something to list here.
 
-## First run
+## First Run
 
 ```bash
 setup-hooks

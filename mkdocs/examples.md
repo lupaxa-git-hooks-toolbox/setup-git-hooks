@@ -1,6 +1,6 @@
 # Examples
 
-## Pre-commit list
+## Pre-Commit List
 
 YAML list order becomes `01-`, `02-`, …
 
@@ -22,7 +22,7 @@ YAML list order becomes `01-`, `02-`, …
 That writes `hooks/pre-commit/01-hello-one`,
 `hooks/pre-commit/02-hello-two`, and `hooks/pre-commit/03-hello-three`.
 
-## Pin a commit
+## Pin a Commit
 
 ```yaml
 - name: Hello one
