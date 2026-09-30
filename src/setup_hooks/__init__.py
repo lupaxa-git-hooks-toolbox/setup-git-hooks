@@ -1,3 +1,3 @@
 """Install Git Hooks Toolbox subhooks from per-type YAML."""
 
-__version__ = "0.1.4"
+__version__ = "0.1.5-rc1"
