@@ -66,8 +66,38 @@ def test_load_hook_type_config_ok(tmp_path: Path) -> None:
     )
     entries = load_hook_type_config(path)
     assert [item.filename for item in entries] == ["ruff", "confirm_default_branch"]
+    assert entries[0].path is None
+    assert entries[1].path is None
     assert installed_basename(1, entries[0].filename) == "01-ruff"
     assert installed_basename(2, entries[1].filename) == "02-confirm_default_branch"
+
+
+def test_load_hook_type_config_optional_path(tmp_path: Path) -> None:
+    path = tmp_path / "pre-commit-config.yml"
+    path.write_text(
+        "- name: Third party\n"
+        "  filename: check-merge-conflict\n"
+        "  url: https://example.test/pre-commit-hooks\n"
+        "  version: v5.0.0\n"
+        "  path: hooks/check-merge-conflict\n",
+        encoding="utf-8",
+    )
+    entries = load_hook_type_config(path)
+    assert entries[0].path == "hooks/check-merge-conflict"
+
+
+def test_load_hook_type_config_rejects_bad_path(tmp_path: Path) -> None:
+    path = tmp_path / "pre-commit-config.yml"
+    path.write_text(
+        "- name: X\n"
+        "  filename: x\n"
+        "  url: https://example.test/x\n"
+        "  version: HEAD\n"
+        "  path: ../secret\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError, match="path"):
+        load_hook_type_config(path)
 
 
 def test_load_hook_type_config_rejects_bad_filename_and_duplicates(tmp_path: Path) -> None:
@@ -115,6 +145,17 @@ def test_load_multiplexer_config(tmp_path: Path) -> None:
     cfg = load_multiplexer_config(path)
     assert cfg.url == "https://example.test/mux"
     assert cfg.version == "LATEST"
+    assert cfg.path is None
+
+
+def test_load_multiplexer_config_optional_path(tmp_path: Path) -> None:
+    path = tmp_path / "multiplexer-config.yml"
+    path.write_text(
+        "url: https://example.test/mux\nversion: HEAD\npath: bin/multiplexer\n",
+        encoding="utf-8",
+    )
+    cfg = load_multiplexer_config(path)
+    assert cfg.path == "bin/multiplexer"
     with pytest.raises(ConfigError, match="mapping"):
         other = tmp_path / "list.yml"
         other.write_text("- url: https://example.test/mux\n  version: HEAD\n", encoding="utf-8")

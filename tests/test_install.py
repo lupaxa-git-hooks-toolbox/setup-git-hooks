@@ -64,6 +64,40 @@ def test_first_install_writes_prefixed_executables_and_mux(tmp_path: Path) -> No
     assert mux.stat().st_mode & 0o111
 
 
+def test_install_uses_optional_path_instead_of_src_type(tmp_path: Path) -> None:
+    repo = tmp_path / "consumer"
+    repo.mkdir()
+    _hooks_dir(repo).mkdir(parents=True)
+    hooks = repo / "hooks"
+    hooks.mkdir()
+    (hooks / "pre-commit-config.yml").write_text(
+        "- name: Third party\n"
+        "  filename: check-merge-conflict\n"
+        "  url: /upstream/pre-commit-hooks\n"
+        "  version: HEAD\n"
+        "  path: hooks/check-merge-conflict\n",
+        encoding="utf-8",
+    )
+    (hooks / "multiplexer-config.yml").write_text(
+        "url: /upstream/mux\nversion: HEAD\npath: bin/multiplexer\n",
+        encoding="utf-8",
+    )
+    install_hook_type(
+        repo,
+        "pre-commit",
+        skip_gitignore=True,
+        hooks_dir=_hooks_dir(repo),
+        resolve_version=_fake_resolve,
+        fetch_blob=_fake_fetch,
+    )
+    script = repo / "hooks" / "pre-commit" / "01-check-merge-conflict"
+    mux = repo / ".git" / "hooks" / "pre-commit"
+    assert script.read_text(encoding="utf-8") == (
+        "/upstream/pre-commit-hooks:hooks/check-merge-conflict\n"
+    )
+    assert mux.read_text(encoding="utf-8") == "/upstream/mux:bin/multiplexer\n"
+
+
 def test_rerun_without_force_fails(tmp_path: Path) -> None:
     repo = tmp_path / "consumer"
     repo.mkdir()

@@ -29,12 +29,14 @@ class HookEntry:
     filename: str
     url: str
     version: str
+    path: str | None = None
 
 
 @dataclass(frozen=True)
 class MultiplexerConfig:
     url: str
     version: str
+    path: str | None = None
 
 
 @dataclass(frozen=True)
@@ -78,6 +80,27 @@ def _require_str(data: dict[str, Any], key: str, where: str) -> str:
     return value.strip()
 
 
+def parse_blob_path(raw: str) -> str:
+    path = raw.strip() if isinstance(raw, str) else ""
+    if not path:
+        raise ConfigError("Invalid path: empty.")
+    if "\\" in path or path.startswith("/") or path.endswith("/"):
+        raise ConfigError(f"Invalid path: {raw!r}.")
+    parts = path.split("/")
+    if any(part in ("", ".", "..") for part in parts):
+        raise ConfigError(f"Invalid path: {raw!r}.")
+    return path
+
+
+def _optional_path(data: dict[str, Any], where: str) -> str | None:
+    if "path" not in data:
+        return None
+    value = data["path"]
+    if not isinstance(value, str) or not value.strip():
+        raise ConfigError(f"Invalid path in {where}.")
+    return parse_blob_path(value.strip())
+
+
 def load_hook_type_config(path: Path) -> list[HookEntry]:
     try:
         loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -105,8 +128,11 @@ def load_hook_type_config(path: Path) -> list[HookEntry]:
         if filename in seen:
             raise ConfigError(f"Duplicate filename {filename!r} in {path}.")
         parse_version(version)
+        blob_path = _optional_path(item, f"entry {offset} of {path}")
         seen.add(filename)
-        entries.append(HookEntry(name=name, filename=filename, url=url, version=version))
+        entries.append(
+            HookEntry(name=name, filename=filename, url=url, version=version, path=blob_path)
+        )
     return entries
 
 
@@ -122,7 +148,8 @@ def load_multiplexer_config(path: Path) -> MultiplexerConfig:
     url = _require_str(loaded, "url", str(path))
     version = _require_str(loaded, "version", str(path))
     parse_version(version)
-    return MultiplexerConfig(url=url, version=version)
+    blob_path = _optional_path(loaded, str(path))
+    return MultiplexerConfig(url=url, version=version, path=blob_path)
 
 
 def hook_type_config_path(hooks_dir: Path, hook_type: str) -> Path:

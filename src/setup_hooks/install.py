@@ -121,10 +121,12 @@ def install_hook_type(
     jobs: list[tuple[Path, str, str, str, str]] = []
     for index, entry in enumerate(entries, start=1):
         dest = dest_dir / installed_basename(index, entry.filename)
-        jobs.append((dest, entry.name, entry.url, entry.version, f"src/{hook_type}"))
+        blob_path = entry.path if entry.path is not None else f"src/{hook_type}"
+        jobs.append((dest, entry.name, entry.url, entry.version, blob_path))
     if mux is not None:
         dest = _destination_hooks_dir(repo_root, hooks_dir) / hook_type
-        jobs.append((dest, "multiplexer", mux.url, mux.version, "src/multiplexer"))
+        mux_blob = mux.path if mux.path is not None else "src/multiplexer"
+        jobs.append((dest, "multiplexer", mux.url, mux.version, mux_blob))
 
     written: list[Path] = []
     try:

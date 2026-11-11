@@ -32,8 +32,9 @@ make init
 
 Create `hooks/pre-commit-config.yml` and `hooks/multiplexer-config.yml` in
 the consuming repository. List order is run order. Each source repo ships
-one file at `src/<type>` (for example `src/pre-commit`). The pre-commit
-template repo is a starter for new hook repos, not something to list here.
+one file at `src/<type>` (for example `src/pre-commit`) unless you set
+`path`. The pre-commit template repo is a starter for new hook repos, not
+something to list here.
 
 ```yaml
 # hooks/pre-commit-config.yml
@@ -61,7 +62,22 @@ That writes `hooks/pre-commit/01-hello-one`, `02-hello-two`, and
 `03-hello-three`. Point the multiplexer YAML at a fork when you maintain
 your own. `name` is the log label only. `filename` is the destination
 basename (`^[A-Za-z0-9._-]+$`); the installed name is `NN-<filename>`
-(`01`–`99`). Duplicate filenames in one file are an error.
+(`01`–`99`). Duplicate filenames in one file are an error. `path` is the
+blob inside the source repo; omit it to fetch `src/<type>` (or
+`src/multiplexer`).
+
+### Third-Party Path
+
+Use `path` when the source file is not at `src/<type>`:
+
+```yaml
+# hooks/pre-commit-config.yml
+- name: Check merge conflict
+  filename: check-merge-conflict
+  url: https://github.com/pre-commit/pre-commit-hooks
+  version: v5.0.0
+  path: contrib/ci/check_merge_conflict.py
+```
 
 | Version          | Resolution                                                      |
 | :--------------- | :-------------------------------------------------------------- |
@@ -100,8 +116,8 @@ setup-hooks --list-hook-types
 ```
 
 `hooks/multiplexer-config.yml` is required unless `--skip-multiplexer`.
-The multiplexer file comes from `src/multiplexer` in the listed repo and
-is written to Git's hooks directory for that type.
+The multiplexer file comes from `src/multiplexer` in the listed repo
+(or `path` if set) and is written to Git's hooks directory for that type.
 
 Each hook updates one line from `Installing ... -> <path>` to
 `Installed ...` (cyan spinner, yellow then green on a TTY; red on
