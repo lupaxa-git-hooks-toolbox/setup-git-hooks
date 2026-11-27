@@ -17,14 +17,8 @@ def _consumer(tmp_path: Path, hook_url: Path, mux_url: Path) -> Path:
     repo = init_repo(tmp_path / "consumer")
     hooks = repo / "hooks"
     hooks.mkdir()
-    (hooks / "pre-commit-config.yml").write_text(
-        f"- name: Demo\n  filename: demo\n  url: {hook_url}\n  version: HEAD\n",
-        encoding="utf-8",
-    )
-    (hooks / "multiplexer-config.yml").write_text(
-        f"url: {mux_url}\nversion: HEAD\n",
-        encoding="utf-8",
-    )
+    (hooks / "pre-commit-config.yml").write_text(f"- name: Demo\n  filename: demo\n  url: {hook_url}\n  version: HEAD\n", encoding="utf-8")
+    (hooks / "multiplexer-config.yml").write_text(f"url: {mux_url}\nversion: HEAD\n", encoding="utf-8")
     return repo
 
 
@@ -81,9 +75,7 @@ def test_cli_skip_flags_and_missing_mux(tmp_path: Path, monkeypatch, capsys) -> 
     assert "Installed Demo -> hooks/pre-commit/01-demo" in err
     assert "Installing multiplexer" not in err
     assert not (repo / ".git" / "hooks" / "pre-commit").exists()
-    assert not (repo / ".gitignore").exists() or GITIGNORE_RULE not in (
-        (repo / ".gitignore").read_text(encoding="utf-8") if (repo / ".gitignore").exists() else ""
-    )
+    assert not (repo / ".gitignore").exists() or GITIGNORE_RULE not in ((repo / ".gitignore").read_text(encoding="utf-8") if (repo / ".gitignore").exists() else "")
 
 
 def test_cli_discovers_two_types(tmp_path: Path, monkeypatch) -> None:
@@ -91,10 +83,7 @@ def test_cli_discovers_two_types(tmp_path: Path, monkeypatch) -> None:
     commit_file(hook, "src/commit-msg", "cm\n", "commit-msg hook")
     mux = _upstream(tmp_path, "mux", "src/multiplexer", "mux\n")
     repo = _consumer(tmp_path, hook, mux)
-    (repo / "hooks" / "commit-msg-config.yml").write_text(
-        f"- name: Msg\n  filename: msg\n  url: {hook}\n  version: HEAD\n",
-        encoding="utf-8",
-    )
+    (repo / "hooks" / "commit-msg-config.yml").write_text(f"- name: Msg\n  filename: msg\n  url: {hook}\n  version: HEAD\n", encoding="utf-8")
     monkeypatch.chdir(repo)
     assert main([]) == 0
     assert (repo / "hooks" / "pre-commit" / "01-demo").read_text(encoding="utf-8") == "pc\n"

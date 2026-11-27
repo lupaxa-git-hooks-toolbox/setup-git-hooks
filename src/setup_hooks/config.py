@@ -130,9 +130,7 @@ def load_hook_type_config(path: Path) -> list[HookEntry]:
         parse_version(version)
         blob_path = _optional_path(item, f"entry {offset} of {path}")
         seen.add(filename)
-        entries.append(
-            HookEntry(name=name, filename=filename, url=url, version=version, path=blob_path)
-        )
+        entries.append(HookEntry(name=name, filename=filename, url=url, version=version, path=blob_path))
     return entries
 
 

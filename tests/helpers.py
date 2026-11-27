@@ -5,13 +5,7 @@ from pathlib import Path
 
 
 def run_git(args: list[str], cwd: Path) -> str:
-    result = subprocess.run(
-        ["git", *args],
-        cwd=cwd,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
+    result = subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True, text=True)
     return result.stdout.strip()
 
 

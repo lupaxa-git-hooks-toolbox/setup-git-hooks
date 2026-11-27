@@ -7,14 +7,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from setup_hooks import git as git_mod
-from setup_hooks.config import (
-    ConfigError,
-    hook_type_config_path,
-    installed_basename,
-    load_hook_type_config,
-    load_multiplexer_config,
-    multiplexer_config_path,
-)
+from setup_hooks.config import ConfigError, hook_type_config_path, installed_basename, load_hook_type_config, load_multiplexer_config, multiplexer_config_path
 from setup_hooks.gitignore import ensure_gitignore
 from setup_hooks.progress import Progress
 
@@ -28,9 +21,7 @@ class InstallError(Exception):
 def generated_scripts(directory: Path) -> list[Path]:
     if not directory.is_dir():
         return []
-    found = [
-        path for path in directory.iterdir() if path.is_file() and GENERATED_NAME.match(path.name)
-    ]
+    found = [path for path in directory.iterdir() if path.is_file() and GENERATED_NAME.match(path.name)]
     return sorted(found)
 
 
@@ -72,11 +63,7 @@ def _destination_hooks_dir(repo_root: Path, hooks_dir: Path | None) -> Path:
         return repo_root / ".git" / "hooks"
     configured = git_mod.core_hooks_path(repo_root)
     if configured:
-        print(
-            f"Warning: core.hooksPath is set to {configured}; "
-            f"writing the multiplexer to {resolved}.",
-            file=sys.stderr,
-        )
+        print(f"Warning: core.hooksPath is set to {configured}; writing the multiplexer to {resolved}.", file=sys.stderr)
     return resolved
 
 
@@ -110,9 +97,7 @@ def install_hook_type(
     dest_dir = config_dir / hook_type
     existing = generated_scripts(dest_dir)
     if existing and not force:
-        raise InstallError(
-            f"Generated scripts already exist in {dest_dir}. Re-run with --force to replace them."
-        )
+        raise InstallError(f"Generated scripts already exist in {dest_dir}. Re-run with --force to replace them.")
 
     report = progress if progress is not None else Progress(enabled=False)
     if existing and force:

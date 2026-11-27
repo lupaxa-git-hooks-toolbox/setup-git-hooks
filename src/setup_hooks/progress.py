@@ -23,16 +23,7 @@ def visible_len(text: str) -> int:
 class Progress:
     """In-place stderr progress: cyan spinner, yellow while running, green/red when done."""
 
-    def __init__(
-        self,
-        stream: TextIO | None = None,
-        *,
-        verbose: bool = False,
-        use_spinner: bool | None = None,
-        use_color: bool | None = None,
-        enabled: bool = True,
-        interval: float = 0.08,
-    ) -> None:
+    def __init__(self, stream: TextIO | None = None, *, verbose: bool = False, use_spinner: bool | None = None, use_color: bool | None = None, enabled: bool = True, interval: float = 0.08) -> None:
         self.stream = sys.stderr if stream is None else stream
         self.verbose = verbose
         self.enabled = enabled

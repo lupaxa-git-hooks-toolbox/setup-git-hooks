@@ -4,14 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from setup_hooks.config import (
-    ConfigError,
-    discover_hook_types,
-    installed_basename,
-    load_hook_type_config,
-    load_multiplexer_config,
-    parse_version,
-)
+from setup_hooks.config import ConfigError, discover_hook_types, installed_basename, load_hook_type_config, load_multiplexer_config, parse_version
 
 
 def test_parse_version_head_and_latest() -> None:
@@ -74,62 +67,35 @@ def test_load_hook_type_config_ok(tmp_path: Path) -> None:
 
 def test_load_hook_type_config_optional_path(tmp_path: Path) -> None:
     path = tmp_path / "pre-commit-config.yml"
-    path.write_text(
-        "- name: Third party\n"
-        "  filename: check-merge-conflict\n"
-        "  url: https://example.test/pre-commit-hooks\n"
-        "  version: v5.0.0\n"
-        "  path: hooks/check-merge-conflict\n",
-        encoding="utf-8",
-    )
+    path.write_text("- name: Third party\n  filename: check-merge-conflict\n  url: https://example.test/pre-commit-hooks\n  version: v5.0.0\n  path: hooks/check-merge-conflict\n", encoding="utf-8")
     entries = load_hook_type_config(path)
     assert entries[0].path == "hooks/check-merge-conflict"
 
 
 def test_load_hook_type_config_rejects_bad_path(tmp_path: Path) -> None:
     path = tmp_path / "pre-commit-config.yml"
-    path.write_text(
-        "- name: X\n"
-        "  filename: x\n"
-        "  url: https://example.test/x\n"
-        "  version: HEAD\n"
-        "  path: ../secret\n",
-        encoding="utf-8",
-    )
+    path.write_text("- name: X\n  filename: x\n  url: https://example.test/x\n  version: HEAD\n  path: ../secret\n", encoding="utf-8")
     with pytest.raises(ConfigError, match="path"):
         load_hook_type_config(path)
 
 
 def test_load_hook_type_config_rejects_bad_filename_and_duplicates(tmp_path: Path) -> None:
     bad = tmp_path / "bad.yml"
-    bad.write_text(
-        "- name: X\n  filename: ../x\n  url: https://example.test/x\n  version: HEAD\n",
-        encoding="utf-8",
-    )
+    bad.write_text("- name: X\n  filename: ../x\n  url: https://example.test/x\n  version: HEAD\n", encoding="utf-8")
     with pytest.raises(ConfigError, match="filename"):
         load_hook_type_config(bad)
     dup = tmp_path / "dup.yml"
-    dup.write_text(
-        "- name: A\n  filename: ruff\n  url: https://example.test/a\n  version: HEAD\n"
-        "- name: B\n  filename: ruff\n  url: https://example.test/b\n  version: HEAD\n",
-        encoding="utf-8",
-    )
+    dup.write_text("- name: A\n  filename: ruff\n  url: https://example.test/a\n  version: HEAD\n- name: B\n  filename: ruff\n  url: https://example.test/b\n  version: HEAD\n", encoding="utf-8")
     with pytest.raises(ConfigError, match="(?i)duplicate"):
         load_hook_type_config(dup)
 
 
 def test_load_hook_type_config_rejects_missing_keys_and_too_many(tmp_path: Path) -> None:
     missing = tmp_path / "missing.yml"
-    missing.write_text(
-        "- name: X\n  url: https://example.test/x\n  version: HEAD\n",
-        encoding="utf-8",
-    )
+    missing.write_text("- name: X\n  url: https://example.test/x\n  version: HEAD\n", encoding="utf-8")
     with pytest.raises(ConfigError, match="filename"):
         load_hook_type_config(missing)
-    lines = [
-        f"- name: H{i}\n  filename: f{i}\n  url: https://example.test/{i}\n  version: HEAD\n"
-        for i in range(100)
-    ]
+    lines = [f"- name: H{i}\n  filename: f{i}\n  url: https://example.test/{i}\n  version: HEAD\n" for i in range(100)]
     many = tmp_path / "many.yml"
     many.write_text("".join(lines), encoding="utf-8")
     with pytest.raises(ConfigError, match="99"):
@@ -138,10 +104,7 @@ def test_load_hook_type_config_rejects_missing_keys_and_too_many(tmp_path: Path)
 
 def test_load_multiplexer_config(tmp_path: Path) -> None:
     path = tmp_path / "multiplexer-config.yml"
-    path.write_text(
-        "url: https://example.test/mux\nversion: LATEST\n",
-        encoding="utf-8",
-    )
+    path.write_text("url: https://example.test/mux\nversion: LATEST\n", encoding="utf-8")
     cfg = load_multiplexer_config(path)
     assert cfg.url == "https://example.test/mux"
     assert cfg.version == "LATEST"
@@ -150,10 +113,7 @@ def test_load_multiplexer_config(tmp_path: Path) -> None:
 
 def test_load_multiplexer_config_optional_path(tmp_path: Path) -> None:
     path = tmp_path / "multiplexer-config.yml"
-    path.write_text(
-        "url: https://example.test/mux\nversion: HEAD\npath: bin/multiplexer\n",
-        encoding="utf-8",
-    )
+    path.write_text("url: https://example.test/mux\nversion: HEAD\npath: bin/multiplexer\n", encoding="utf-8")
     cfg = load_multiplexer_config(path)
     assert cfg.path == "bin/multiplexer"
     with pytest.raises(ConfigError, match="mapping"):

@@ -11,43 +11,13 @@ from setup_hooks.progress import Progress
 
 
 def setup_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog="setup-hooks",
-        description="Install Git Hooks Toolbox subhooks from per-type YAML.",
-    )
-    parser.add_argument(
-        "-t",
-        "--hook-type",
-        default=None,
-        help="Install only this hook type (default: all discovered types).",
-    )
-    parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Clear generated scripts for the type, then reinstall.",
-    )
-    parser.add_argument(
-        "--skip-multiplexer",
-        action="store_true",
-        help="Do not require or install the multiplexer.",
-    )
-    parser.add_argument(
-        "--skip-gitignore",
-        action="store_true",
-        help="Do not edit .gitignore.",
-    )
-    parser.add_argument(
-        "-l",
-        "--list-hook-types",
-        action="store_true",
-        help="Print discovered hook types and exit.",
-    )
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        action="store_true",
-        help="Print extra progress on stderr (source URL and version).",
-    )
+    parser = argparse.ArgumentParser(prog="setup-hooks", description="Install Git Hooks Toolbox subhooks from per-type YAML.")
+    parser.add_argument("-t", "--hook-type", default=None, help="Install only this hook type (default: all discovered types).")
+    parser.add_argument("--force", action="store_true", help="Clear generated scripts for the type, then reinstall.")
+    parser.add_argument("--skip-multiplexer", action="store_true", help="Do not require or install the multiplexer.")
+    parser.add_argument("--skip-gitignore", action="store_true", help="Do not edit .gitignore.")
+    parser.add_argument("-l", "--list-hook-types", action="store_true", help="Print discovered hook types and exit.")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Print extra progress on stderr (source URL and version).")
     return parser
 
 
@@ -62,11 +32,7 @@ def main(argv: list[str] | None = None) -> int:
 
     configured = core_hooks_path(root)
     if configured:
-        print(
-            f"Warning: core.hooksPath is set to {configured}; "
-            f"writing the multiplexer to {dest_hooks}.",
-            file=sys.stderr,
-        )
+        print(f"Warning: core.hooksPath is set to {configured}; writing the multiplexer to {dest_hooks}.", file=sys.stderr)
 
     hooks_dir = root / "hooks"
     types = discover_hook_types(hooks_dir)
@@ -85,15 +51,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         for hook_type in types:
             try:
-                install_hook_type(
-                    root,
-                    hook_type,
-                    force=args.force,
-                    skip_multiplexer=args.skip_multiplexer,
-                    skip_gitignore=True,
-                    hooks_dir=dest_hooks,
-                    progress=progress,
-                )
+                install_hook_type(root, hook_type, force=args.force, skip_multiplexer=args.skip_multiplexer, skip_gitignore=True, hooks_dir=dest_hooks, progress=progress)
             except (InstallError, ConfigError, GitError) as exc:
                 if not progress.failed:
                     progress.fail(str(exc))

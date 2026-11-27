@@ -149,19 +149,12 @@ def fetch_blob(url: str, ref: str, blob_path: str) -> bytes:
             raise GitError(f"Failed to create temp git dir: {init.stderr.strip()}")
 
         def show(spec: str) -> bytes | None:
-            shown = subprocess.run(
-                ["git", "--git-dir", str(git_dir), "show", spec],
-                capture_output=True,
-                check=False,
-            )
+            shown = subprocess.run(["git", "--git-dir", str(git_dir), "show", spec], capture_output=True, check=False)
             if shown.returncode != 0:
                 return None
             return shown.stdout
 
-        for fetch_args in (
-            ["git", "--git-dir", str(git_dir), "fetch", "--depth", "1", url, ref],
-            ["git", "--git-dir", str(git_dir), "fetch", url, ref],
-        ):
+        for fetch_args in (["git", "--git-dir", str(git_dir), "fetch", "--depth", "1", url, ref], ["git", "--git-dir", str(git_dir), "fetch", url, ref]):
             fetched = _run(fetch_args)
             if fetched.returncode == 0:
                 content = show(f"FETCH_HEAD:{blob_path}")
